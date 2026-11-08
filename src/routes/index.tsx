@@ -52,7 +52,7 @@ function Survey() {
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const step = STEPS[i];
+  const step = STEPS[i]!;
   const value = a[step.key];
   const canNext =
     step.key === "q8" ? true :
