@@ -74,9 +74,9 @@ function Survey() {
   }
 
   function next() {
-    if (step.key === "q1" && a.q1 === Q1_DISQUALIFY) return submit(a, true);
-    if (i === STEPS.length - 1) return submit(a, false);
-    setI(i + 1);
+    if (step.key === "q1" && a.q1 === Q1_DISQUALIFY) void submit(a, true);
+    else if (i === STEPS.length - 1) void submit(a, false);
+    else setI(i + 1);
   }
 
   return (
