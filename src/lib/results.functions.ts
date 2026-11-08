@@ -11,7 +11,7 @@ export const getResults = createServerFn({ method: "POST" })
     if (!timingSafeEqual(a, b)) return { ok: false as const, error: "كلمة المرور غير صحيحة" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
-      .from("survey_responses")
+      .from("cpf_responses")
       .select("*")
       .order("created_at", { ascending: false });
     if (error) return { ok: false as const, error: "تعذر جلب النتائج" };

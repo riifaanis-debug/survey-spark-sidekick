@@ -2,17 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Q1_OPTIONS, Q1_DISQUALIFY, Q2_OPTIONS, Q2_OTHER, Q3_OPTIONS, Q5_OPTIONS,
-  Q4_SCALE, Q6_SCALE, Q7_SCALE,
+  QUESTIONS, Q1_OPTIONS, Q1_DISQUALIFY, Q2_OPTIONS, Q3_SCALE, Q4_OPTIONS, IMP_SCALE, HELP_SCALE, Q9_OPTIONS,
 } from "@/lib/survey";
+
+const TITLE = "استبيان تقييم فكرة CPF™";
+const DESC = "استبيان لأخصائيي التحصيل لتقييم إطار Collection Persona Framework™.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "استبيان دراسة كفاءة قرارات التحصيل المصرفي" },
-      { name: "description", content: "شاركنا خبرتك في قرارات التحصيل المصرفي — أقل من 3 دقائق." },
-      { property: "og:title", content: "استبيان دراسة كفاءة قرارات التحصيل المصرفي" },
-      { property: "og:description", content: "شاركنا خبرتك في قرارات التحصيل المصرفي — أقل من 3 دقائق." },
+      { title: TITLE },
+      { name: "description", content: DESC },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESC },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -21,28 +23,27 @@ export const Route = createFileRoute("/")({
 });
 
 type Answers = {
-  q1?: string; q2?: string; q2_other?: string; q3?: string;
-  q4?: number; q5?: string; q6?: number; q7?: number; q8?: string;
+  q1?: string; q2?: string[]; q3?: number; q4?: string; q5?: number;
+  q6?: number; q7?: number; q8?: number; q9?: string; q10?: string;
 };
-
+type Key = keyof Answers;
 type Step =
-  | { key: "q1" | "q2" | "q3" | "q5"; section: string; title: string; options: string[] }
-  | { key: "q4" | "q6" | "q7"; section: string; title: string; scale: string[] }
-  | { key: "q8"; section: string; title: string };
-
-const S1 = "الفرز والسلوك الحالي";
-const S2 = "تقييم مفهوم المنظومة والتفضيل";
-const S3 = "وضوح الهيكلية والانطباعات";
+  | { key: Key; kind: "single"; options: string[]; hint?: string }
+  | { key: Key; kind: "multi"; options: string[]; hint?: string }
+  | { key: Key; kind: "scale"; scale: string[] }
+  | { key: Key; kind: "text" };
 
 const STEPS: Step[] = [
-  { key: "q1", section: S1, title: "ما هو مجال عملك الحالي؟", options: Q1_OPTIONS },
-  { key: "q2", section: S1, title: "كيف يتم تحديد \"إجراء وتوقيت التواصل\" مع العميل المتعثر في آلية عملك الحالية عادةً؟", options: Q2_OPTIONS },
-  { key: "q3", section: S1, title: "ما هي أكبر صعوبة تشغيلية تلاحظها أثناء عمليات التواصل والتحصيل؟", options: Q3_OPTIONS },
-  { key: "q4", section: S2, title: "عند تقديم منظومة تحليلية تُحلل \"أبعاد العميل السلوكية والمالية\" وتَفصل بين مستوى الثقة وجاهزية القرار وتُعطي كود سبب (Reason Code) يوضح تبرير كل قرار، ما مدى أهمية ذلك لك؟", scale: Q4_SCALE },
-  { key: "q5", section: S2, title: "أي الأسلوبين تفضل اعتماده أثناء العمل الميداني؟", options: Q5_OPTIONS },
-  { key: "q6", section: S2, title: "إلى أي مدى تعتقد أن تحديد \"التوقيت الأنسب للرد\" (المستخرج من سجلات الاتصال التاريخية) و\"القناة المفضلة\" يساعد في تقليل المحاولات غير المنتجة؟", scale: Q6_SCALE },
-  { key: "q7", section: S3, title: "ما مدى وضوح وفهم التسلسل المنطقي للمراحل الـ 12 (استلام البيانات ← التحليل والأبعاد ← فحص الجاهزية ← محرك القرار والتوصية ← القياس والتحديث)؟", scale: Q7_SCALE },
-  { key: "q8", section: S3, title: "ما هي مقترحاتك أو ملاحظاتك لتطوير هذه المنظومة لترفع من كفاءة القرار في التحصيل المصرفي؟" },
+  { key: "q1", kind: "single", options: Q1_OPTIONS },
+  { key: "q2", kind: "multi", options: Q2_OPTIONS, hint: "يمكن اختيار أكثر من إجابة" },
+  { key: "q3", kind: "scale", scale: Q3_SCALE },
+  { key: "q4", kind: "single", options: Q4_OPTIONS },
+  { key: "q5", kind: "scale", scale: IMP_SCALE },
+  { key: "q6", kind: "scale", scale: HELP_SCALE },
+  { key: "q7", kind: "scale", scale: IMP_SCALE },
+  { key: "q8", kind: "scale", scale: HELP_SCALE },
+  { key: "q9", kind: "single", options: Q9_OPTIONS, hint: "اختر إجابة واحدة" },
+  { key: "q10", kind: "text" },
 ];
 
 function Survey() {
@@ -55,21 +56,19 @@ function Survey() {
   const step = STEPS[i]!;
   const value = a[step.key];
   const canNext =
-    step.key === "q8" ? true :
-    step.key === "q2" && value === Q2_OTHER ? !!a.q2_other?.trim() :
-    value !== undefined && value !== "";
+    step.kind === "text" ? true :
+    step.kind === "multi" ? Array.isArray(value) && value.length > 0 :
+    value !== undefined;
 
-  async function submit(final: Answers, disqualified: boolean) {
+  async function submit(f: Answers, disqualified: boolean) {
     setSending(true); setErr(null);
-    const { error } = await supabase.from("survey_responses").insert({
-      q1: final.q1!, q2: final.q2 ?? null,
-      q2_other: final.q2 === Q2_OTHER ? final.q2_other?.trim().slice(0, 500) ?? null : null,
-      q3: final.q3 ?? null, q4: final.q4 ?? null, q5: final.q5 ?? null,
-      q6: final.q6 ?? null, q7: final.q7 ?? null,
-      q8: final.q8?.trim().slice(0, 3000) || null, disqualified,
+    const { error } = await supabase.from("cpf_responses").insert({
+      q1: f.q1!, q2: f.q2 ?? null, q3: f.q3 ?? null, q4: f.q4 ?? null, q5: f.q5 ?? null,
+      q6: f.q6 ?? null, q7: f.q7 ?? null, q8: f.q8 ?? null, q9: f.q9 ?? null,
+      q10: f.q10?.trim().slice(0, 3000) || null, disqualified,
     });
     setSending(false);
-    if (error) { setErr("تعذر إرسال الإجابة، حاول مرة أخرى."); return; }
+    if (error) { setErr("تعذّر حفظ الإجابات. حاول مرة أخرى."); return; }
     setStage(disqualified ? "out" : "done");
   }
 
@@ -79,27 +78,42 @@ function Survey() {
     else setI(i + 1);
   }
 
+  function toggle(o: string) {
+    const cur = a.q2 ?? [];
+    setA({ ...a, q2: cur.includes(o) ? cur.filter((x) => x !== o) : [...cur, o] });
+  }
+
+  const optBtn = (sel: boolean) =>
+    `flex w-full items-center gap-3 rounded-xl border p-3.5 text-start text-sm leading-relaxed transition ${sel ? "border-primary bg-secondary text-secondary-foreground ring-2 ring-primary/30" : "bg-card hover:bg-muted"}`;
+
   return (
     <main className="bg-hero min-h-screen px-4 py-8 sm:py-14">
       <div className="mx-auto max-w-xl">
         <header className="mb-6 flex items-center gap-3">
           <div className="h-10 w-1.5 rounded-full bg-gold" />
           <div>
-            <p className="text-xs font-medium text-muted-foreground">استبيان تحقق</p>
+            <p className="text-xs font-medium text-muted-foreground">استبيان تقييم فكرة</p>
             <h1 className="text-lg font-bold leading-snug text-primary sm:text-xl">
-              دراسة كفاءة قرارات التحصيل المصرفي والتحليل السلوكي
+              Collection Persona Framework™ (CPF™)
             </h1>
           </div>
         </header>
 
         <section className="rounded-2xl border bg-card p-5 shadow-card sm:p-8">
           {stage === "intro" && (
-            <div className="space-y-6">
-              <p className="leading-loose text-card-foreground">
-                أهلاً بك. نهدف من خلال هذا الاستبيان القصير (يستغرق أقل من 3 دقائق) إلى استطلاع الآراء والخبرات التشغيلية حول آليات اتخاذ القرار في التحصيل المصرفي وتحديد أفضل القنوات والأوقات للتواصل مع العملاء. مشاركتك تطوعية وستعامل جميع الإجابات بسرية تامة لأغراض البحث والتطوير فقط. شكراً لوقتك ومساهمتك.
+            <div className="space-y-5 leading-loose text-card-foreground">
+              <p>
+                عزيزي أخصائي التحصيل، يهدف هذا الاستبيان إلى التعرف على التحديات التي تواجهك في التعامل مع العملاء المتعثرين، وقياس الحاجة إلى إطار تحليلي يساعد على فهم اختلاف خصائص العملاء وتصنيفهم.
+              </p>
+              <div className="rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
+                <p className="mb-1 font-semibold">نبذة عن الفكرة:</p>
+                إطار تحليلي وتشغيلي يصنّف العملاء المتعثرين ضمن ثماني شخصيات، استنادًا إلى سبعة أبعاد: القدرة على السداد، إمكانية الوصول، التفاعل، الالتزام بوعود السداد، سلوك قنوات التواصل، العوائق التي تواجه العميل، وتعقيد الحالة. ويعرض درجة تحليلية ومبررات التصنيف والتوصية بالإجراء المناسب.
+              </div>
+              <p className="rounded-xl border border-gold bg-accent p-3 text-sm text-accent-foreground">
+                يرجى الإجابة بناءً على خبرتك العملية، مع عدم إدراج أي بيانات تعريفية أو مصرفية تخص العملاء.
               </p>
               <button onClick={() => setStage("q")} className="w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground transition hover:opacity-90">
-                أوافق وأبدأ
+                ابدأ الاستبيان
               </button>
             </div>
           )}
@@ -107,8 +121,7 @@ function Survey() {
           {stage === "q" && (
             <div className="space-y-5">
               <div>
-                <div className="mb-2 flex justify-between text-xs text-muted-foreground">
-                  <span>{step.section}</span>
+                <div className="mb-2 flex justify-end text-xs text-muted-foreground">
                   <span>سؤال {i + 1} من {STEPS.length}</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-muted">
@@ -116,33 +129,39 @@ function Survey() {
                 </div>
               </div>
 
-              <h2 className="text-base font-semibold leading-relaxed sm:text-lg">{step.title}</h2>
+              <h2 className="text-base font-semibold leading-relaxed sm:text-lg">
+                {i + 1}. {QUESTIONS[step.key]}
+                {"hint" in step && step.hint && <span className="block text-sm font-normal text-muted-foreground">({step.hint})</span>}
+              </h2>
 
-              {"options" in step && (
+              {step.kind === "single" && (
                 <div className="space-y-2.5">
-                  {step.options.map((o) => {
-                    const sel = value === o;
-                    return (
-                      <button key={o} onClick={() => setA({ ...a, [step.key]: o })}
-                        className={`w-full rounded-xl border p-3.5 text-start text-sm leading-relaxed transition ${sel ? "border-primary bg-secondary text-secondary-foreground ring-2 ring-primary/30" : "bg-card hover:bg-muted"}`}>
-                        {o === Q2_OTHER && step.key === "q2" ? "أخرى (يرجى التحديد)" : o}
-                      </button>
-                    );
-                  })}
-                  {step.key === "q2" && a.q2 === Q2_OTHER && (
-                    <input autoFocus maxLength={500} value={a.q2_other ?? ""} onChange={(e) => setA({ ...a, q2_other: e.target.value })}
-                      placeholder="يرجى التحديد" className="w-full rounded-xl border bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-ring" />
-                  )}
+                  {step.options.map((o) => (
+                    <button key={o} onClick={() => setA({ ...a, [step.key]: o })} className={optBtn(value === o)}>{o}</button>
+                  ))}
                 </div>
               )}
 
-              {"scale" in step && (
+              {step.kind === "multi" && (
+                <div className="space-y-2.5">
+                  {step.options.map((o) => {
+                    const sel = (a.q2 ?? []).includes(o);
+                    return (
+                      <button key={o} onClick={() => toggle(o)} className={optBtn(sel)}>
+                        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded border text-xs ${sel ? "border-primary bg-primary text-primary-foreground" : ""}`}>{sel ? "✓" : ""}</span>
+                        {o}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {step.kind === "scale" && (
                 <div className="space-y-2">
                   {step.scale.map((label, idx) => {
                     const n = idx + 1; const sel = value === n;
                     return (
-                      <button key={n} onClick={() => setA({ ...a, [step.key]: n })}
-                        className={`flex w-full items-center gap-3 rounded-xl border p-3 text-start text-sm transition ${sel ? "border-primary bg-secondary ring-2 ring-primary/30" : "bg-card hover:bg-muted"}`}>
+                      <button key={n} onClick={() => setA({ ...a, [step.key]: n })} className={optBtn(sel)}>
                         <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg font-bold ${sel ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{n}</span>
                         {label}
                       </button>
@@ -151,9 +170,9 @@ function Survey() {
                 </div>
               )}
 
-              {step.key === "q8" && (
-                <textarea rows={5} maxLength={3000} value={a.q8 ?? ""} onChange={(e) => setA({ ...a, q8: e.target.value })}
-                  placeholder="اكتب ملاحظاتك هنا (اختياري)" className="w-full rounded-xl border bg-background p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring" />
+              {step.kind === "text" && (
+                <textarea rows={5} maxLength={3000} value={a.q10 ?? ""} onChange={(e) => setA({ ...a, q10: e.target.value })}
+                  placeholder="اكتب إجابتك هنا (اختياري)" className="w-full rounded-xl border bg-background p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring" />
               )}
 
               {err && <p className="text-sm text-destructive">{err}</p>}
@@ -164,7 +183,7 @@ function Survey() {
                 )}
                 <button disabled={!canNext || sending} onClick={next}
                   className="flex-1 rounded-xl bg-primary py-3 font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
-                  {sending ? "جارٍ الإرسال..." : i === STEPS.length - 1 ? "إرسال" : "التالي"}
+                  {sending ? "جارٍ الإرسال..." : i === STEPS.length - 1 ? "إرسال الإجابات" : "التالي"}
                 </button>
               </div>
             </div>
@@ -173,11 +192,11 @@ function Survey() {
           {(stage === "done" || stage === "out") && (
             <div className="space-y-3 py-6 text-center">
               <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-secondary text-2xl text-primary">✓</div>
-              <h2 className="text-xl font-bold text-primary">شكراً لك</h2>
+              <h2 className="text-xl font-bold text-primary">شكرًا لمشاركتك</h2>
               <p className="leading-loose text-muted-foreground">
                 {stage === "done"
-                  ? "نشكرك جزيلاً على وقتك ومشاركتك القيمة، إجاباتك ستساهم بشكل مباشر في تطوير وتحديث أدلة التحقق الخاصة بالمشروع."
-                  : "نشكرك على وقتك. هذا الاستبيان مخصص للعاملين في مجالات التحصيل والمخاطر والاستشارات المالية."}
+                  ? "تم تسجيل إجابتك. نقدّر وقتك وخبرتك في تطوير Collection Persona Framework™."
+                  : "نشكرك على وقتك. هذا الاستبيان مخصص للعاملين في مجال تحصيل الديون المتعثرة للأفراد."}
               </p>
             </div>
           )}

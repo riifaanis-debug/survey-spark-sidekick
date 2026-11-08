@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { hypothesisResult } from "./survey";
+import { positiveShare } from "./survey";
 
-describe("hypothesisResult", () => {
-  it("11 of 15 meets the target", () => expect(hypothesisResult(11, 15).met).toBe(true));
-  it("10 of 15 does not meet the target", () => expect(hypothesisResult(10, 15).met).toBe(false));
-  it("no responses does not meet the target", () => expect(hypothesisResult(0, 0).met).toBe(false));
+describe("positiveShare", () => {
+  it("counts 4 and 5 as positive", () => expect(positiveShare([5, 4, 3, 2])).toBe(0.5));
+  it("ignores unanswered", () => expect(positiveShare([4, null])).toBe(1));
+  it("empty is zero", () => expect(positiveShare([])).toBe(0));
 });

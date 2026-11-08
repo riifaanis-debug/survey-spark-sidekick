@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      cpf_responses: {
+        Row: {
+          created_at: string
+          disqualified: boolean
+          id: string
+          q1: string
+          q10: string | null
+          q2: string[] | null
+          q3: number | null
+          q4: string | null
+          q5: number | null
+          q6: number | null
+          q7: number | null
+          q8: number | null
+          q9: string | null
+        }
+        Insert: {
+          created_at?: string
+          disqualified?: boolean
+          id?: string
+          q1: string
+          q10?: string | null
+          q2?: string[] | null
+          q3?: number | null
+          q4?: string | null
+          q5?: number | null
+          q6?: number | null
+          q7?: number | null
+          q8?: number | null
+          q9?: string | null
+        }
+        Update: {
+          created_at?: string
+          disqualified?: boolean
+          id?: string
+          q1?: string
+          q10?: string | null
+          q2?: string[] | null
+          q3?: number | null
+          q4?: string | null
+          q5?: number | null
+          q6?: number | null
+          q7?: number | null
+          q8?: number | null
+          q9?: string | null
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
           created_at: string
