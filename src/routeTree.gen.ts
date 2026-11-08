@@ -10,11 +10,37 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HypothesisRouteImport } from './routes/hypothesis'
+import { Route as KpiRouteImport } from './routes/kpi'
+import { Route as Kpi1RouteImport } from './routes/kpi-1'
+import { Route as Kpi2RouteImport } from './routes/kpi-2'
 import { Route as ResultsRouteImport } from './routes/results'
+import { Route as SurveyRouteImport } from './routes/survey'
+import { Route as ValidationRouteImport } from './routes/validation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HypothesisRoute = HypothesisRouteImport.update({
+  id: '/hypothesis',
+  path: '/hypothesis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KpiRoute = KpiRouteImport.update({
+  id: '/kpi',
+  path: '/kpi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Kpi1Route = Kpi1RouteImport.update({
+  id: '/kpi-1',
+  path: '/kpi-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Kpi2Route = Kpi2RouteImport.update({
+  id: '/kpi-2',
+  path: '/kpi-2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultsRoute = ResultsRouteImport.update({
@@ -22,31 +48,90 @@ const ResultsRoute = ResultsRouteImport.update({
   path: '/results',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SurveyRoute = SurveyRouteImport.update({
+  id: '/survey',
+  path: '/survey',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ValidationRoute = ValidationRouteImport.update({
+  id: '/validation',
+  path: '/validation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/hypothesis': typeof HypothesisRoute
+  '/kpi': typeof KpiRoute
+  '/kpi-1': typeof Kpi1Route
+  '/kpi-2': typeof Kpi2Route
   '/results': typeof ResultsRoute
+  '/survey': typeof SurveyRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/hypothesis': typeof HypothesisRoute
+  '/kpi': typeof KpiRoute
+  '/kpi-1': typeof Kpi1Route
+  '/kpi-2': typeof Kpi2Route
   '/results': typeof ResultsRoute
+  '/survey': typeof SurveyRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/hypothesis': typeof HypothesisRoute
+  '/kpi': typeof KpiRoute
+  '/kpi-1': typeof Kpi1Route
+  '/kpi-2': typeof Kpi2Route
   '/results': typeof ResultsRoute
+  '/survey': typeof SurveyRoute
+  '/validation': typeof ValidationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/results'
+  fullPaths:
+    | '/'
+    | '/hypothesis'
+    | '/kpi'
+    | '/kpi-1'
+    | '/kpi-2'
+    | '/results'
+    | '/survey'
+    | '/validation'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/results'
-  id: '__root__' | '/' | '/results'
+  to:
+    | '/'
+    | '/hypothesis'
+    | '/kpi'
+    | '/kpi-1'
+    | '/kpi-2'
+    | '/results'
+    | '/survey'
+    | '/validation'
+  id:
+    | '__root__'
+    | '/'
+    | '/hypothesis'
+    | '/kpi'
+    | '/kpi-1'
+    | '/kpi-2'
+    | '/results'
+    | '/survey'
+    | '/validation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HypothesisRoute: typeof HypothesisRoute
+  KpiRoute: typeof KpiRoute
+  Kpi1Route: typeof Kpi1Route
+  Kpi2Route: typeof Kpi2Route
   ResultsRoute: typeof ResultsRoute
+  SurveyRoute: typeof SurveyRoute
+  ValidationRoute: typeof ValidationRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +143,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hypothesis': {
+      id: '/hypothesis'
+      path: '/hypothesis'
+      fullPath: '/hypothesis'
+      preLoaderRoute: typeof HypothesisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi': {
+      id: '/kpi'
+      path: '/kpi'
+      fullPath: '/kpi'
+      preLoaderRoute: typeof KpiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-1': {
+      id: '/kpi-1'
+      path: '/kpi-1'
+      fullPath: '/kpi-1'
+      preLoaderRoute: typeof Kpi1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kpi-2': {
+      id: '/kpi-2'
+      path: '/kpi-2'
+      fullPath: '/kpi-2'
+      preLoaderRoute: typeof Kpi2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/results': {
       id: '/results'
       path: '/results'
@@ -65,12 +178,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/survey': {
+      id: '/survey'
+      path: '/survey'
+      fullPath: '/survey'
+      preLoaderRoute: typeof SurveyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/validation': {
+      id: '/validation'
+      path: '/validation'
+      fullPath: '/validation'
+      preLoaderRoute: typeof ValidationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HypothesisRoute: HypothesisRoute,
+  KpiRoute: KpiRoute,
+  Kpi1Route: Kpi1Route,
+  Kpi2Route: Kpi2Route,
   ResultsRoute: ResultsRoute,
+  SurveyRoute: SurveyRoute,
+  ValidationRoute: ValidationRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

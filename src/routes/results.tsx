@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
+import { PageNav } from "@/components/SiteNav";
 import { getResults } from "@/lib/results.functions";
 import {
   QUESTIONS, Q1_OPTIONS, Q2_OPTIONS, Q3_SCALE, Q4_OPTIONS, IMP_SCALE, HELP_SCALE, Q9_OPTIONS, YES,
@@ -86,7 +87,7 @@ function Results() {
 
   if (!rows) {
     return (
-      <main className="bg-hero grid min-h-screen place-items-center px-4">
+      <main className="bg-hero grid min-h-screen place-content-center justify-items-center px-4">
         <form onSubmit={load} className="w-full max-w-sm space-y-4 rounded-2xl border bg-card p-6 shadow-card">
           <h1 className="text-lg font-bold text-primary">نتائج استبيان CPF™</h1>
           <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="الرقم السري"
@@ -96,6 +97,7 @@ function Results() {
             {loading ? "جارٍ التحميل..." : "عرض النتائج"}
           </button>
         </form>
+        <div className="w-full max-w-sm"><PageNav /></div>
       </main>
     );
   }
