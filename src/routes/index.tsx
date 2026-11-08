@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -84,7 +84,7 @@ function Survey() {
   }
 
   const optBtn = (sel: boolean) =>
-    `flex w-full items-center gap-3 rounded-xl border p-3.5 text-start text-sm leading-relaxed transition ${sel ? "border-primary bg-secondary text-secondary-foreground ring-2 ring-primary/30" : "bg-card hover:bg-muted"}`;
+    `flex w-full items-center gap-3 rounded-xl border p-2.5 text-start text-sm leading-relaxed transition ${sel ? "border-primary bg-secondary text-secondary-foreground ring-2 ring-primary/30" : "bg-card hover:bg-muted"}`;
 
   return (
     <main className="bg-hero min-h-screen px-4 py-8 sm:py-14">
@@ -112,7 +112,7 @@ function Survey() {
               <p className="rounded-xl border border-gold bg-accent p-3 text-sm text-accent-foreground">
                 يرجى الإجابة بناءً على خبرتك العملية، مع عدم إدراج أي بيانات تعريفية أو مصرفية تخص العملاء.
               </p>
-              <button onClick={() => setStage("q")} className="w-full rounded-xl bg-primary py-3.5 font-semibold text-primary-foreground transition hover:opacity-90">
+              <button onClick={() => setStage("q")} className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground transition hover:opacity-90">
                 ابدأ الاستبيان
               </button>
             </div>
@@ -162,7 +162,7 @@ function Survey() {
                     const n = idx + 1; const sel = value === n;
                     return (
                       <button key={n} onClick={() => setA({ ...a, [step.key]: n })} className={optBtn(sel)}>
-                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg font-bold ${sel ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{n}</span>
+                        <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg font-bold ${sel ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{n}</span>
                         {label}
                       </button>
                     );
@@ -179,10 +179,10 @@ function Survey() {
 
               <div className="flex gap-3 pt-2">
                 {i > 0 && (
-                  <button onClick={() => setI(i - 1)} className="rounded-xl border px-5 py-3 text-sm font-medium hover:bg-muted">السابق</button>
+                  <button onClick={() => setI(i - 1)} className="rounded-xl border px-5 py-2.5 text-sm font-medium hover:bg-muted">السابق</button>
                 )}
                 <button disabled={!canNext || sending} onClick={next}
-                  className="flex-1 rounded-xl bg-primary py-3 font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
+                  className="flex-1 rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-40">
                   {sending ? "جارٍ الإرسال..." : i === STEPS.length - 1 ? "إرسال الإجابات" : "التالي"}
                 </button>
               </div>
@@ -201,6 +201,12 @@ function Survey() {
             </div>
           )}
         </section>
+
+        <div className="mt-4 text-center">
+          <Link to="/results" className="inline-block rounded-lg border bg-card px-4 py-2 text-xs font-medium text-primary hover:bg-muted">
+            عرض النتائج (برقم سري)
+          </Link>
+        </div>
       </div>
     </main>
   );

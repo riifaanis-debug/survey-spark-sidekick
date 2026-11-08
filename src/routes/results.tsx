@@ -89,10 +89,10 @@ function Results() {
       <main className="bg-hero grid min-h-screen place-items-center px-4">
         <form onSubmit={load} className="w-full max-w-sm space-y-4 rounded-2xl border bg-card p-6 shadow-card">
           <h1 className="text-lg font-bold text-primary">نتائج استبيان CPF™</h1>
-          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="كلمة المرور"
+          <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="الرقم السري"
             className="w-full rounded-xl border bg-background p-3 outline-none focus:ring-2 focus:ring-ring" />
           {err && <p className="text-sm text-destructive">{err}</p>}
-          <button disabled={loading || !pw} className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-40">
+          <button disabled={loading || !pw} className="w-full rounded-xl bg-primary py-2.5 font-semibold text-primary-foreground disabled:opacity-40">
             {loading ? "جارٍ التحميل..." : "عرض النتائج"}
           </button>
         </form>
